@@ -1,8 +1,10 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/Nerdigy.Results.Http/Nerdigy.Results.Http.csproj" />
     <Project Path="src/Nerdigy.Results/Nerdigy.Results.csproj" />
   </Folder>
   <Folder Name="/test/">
+    <Project Path="test/Nerdigy.Results.Http.Tests/Nerdigy.Results.Http.Tests.csproj" />
     <Project Path="test/Nerdigy.Results.Tests/Nerdigy.Results.Tests.csproj" />
   </Folder>
 </Solution>
