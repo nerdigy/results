@@ -86,6 +86,7 @@ jobs:
 
           projects=(
             "src/Nerdigy.Results/Nerdigy.Results.csproj"
+            "src/Nerdigy.Results.Http/Nerdigy.Results.Http.csproj"
           )
 
           for project in "${projects[@]}"; do
