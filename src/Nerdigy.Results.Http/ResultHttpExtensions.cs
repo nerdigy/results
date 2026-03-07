@@ -67,7 +67,7 @@ public static class ResultHttpExtensions
                 : ToHttpProblemResult(result.Error);
         }
     }
-    
+
     /// <summary>
     /// Converts the specified <see cref="Error"/> to an <see cref="IResult"/> containing Problem Details.
     /// </summary>
@@ -77,18 +77,18 @@ public static class ResultHttpExtensions
     {
         return error switch
         {
-            ValidationError e     => CreateValidationProblem(e),
-            BadRequestError e     => CreateProblem(StatusCodes.Status400BadRequest, "Bad Request", e.Message),
-            UnauthorizedError e   => CreateProblem(StatusCodes.Status401Unauthorized, "Unauthorized", e.Message),
-            ForbiddenError e      => CreateProblem(StatusCodes.Status403Forbidden, "Forbidden", e.Message),
-            NotFoundError e       => CreateProblem(StatusCodes.Status404NotFound, "Not Found", e.Message),
-            ConflictError e       => CreateProblem(StatusCodes.Status409Conflict, "Conflict", e.Message),
-            UnprocessableError e  => CreateProblem(StatusCodes.Status422UnprocessableEntity, "Unprocessable Entity", e.Message),
+            ValidationError e => CreateValidationProblem(e),
+            BadRequestError e => CreateProblem(StatusCodes.Status400BadRequest, "Bad Request", e.Message),
+            UnauthorizedError e => CreateProblem(StatusCodes.Status401Unauthorized, "Unauthorized", e.Message),
+            ForbiddenError e => CreateProblem(StatusCodes.Status403Forbidden, "Forbidden", e.Message),
+            NotFoundError e => CreateProblem(StatusCodes.Status404NotFound, "Not Found", e.Message),
+            ConflictError e => CreateProblem(StatusCodes.Status409Conflict, "Conflict", e.Message),
+            UnprocessableError e => CreateProblem(StatusCodes.Status422UnprocessableEntity, "Unprocessable Entity", e.Message),
             TooManyRequestsError e => CreateProblem(StatusCodes.Status429TooManyRequests, "Too Many Requests", e.Message),
-            InternalError e       => CreateProblem(StatusCodes.Status500InternalServerError, "Internal Server Error", e.Message),
+            InternalError e => CreateProblem(StatusCodes.Status500InternalServerError, "Internal Server Error", e.Message),
             ServiceUnavailableError e => CreateProblem(StatusCodes.Status503ServiceUnavailable, "Service Unavailable", e.Message),
             GatewayTimeoutError e => CreateProblem(StatusCodes.Status504GatewayTimeout, "Gateway Timeout", e.Message),
-            _                     => CreateProblem(StatusCodes.Status500InternalServerError, "Internal Server Error", "An unexpected error occurred"),
+            _ => CreateProblem(StatusCodes.Status500InternalServerError, "Internal Server Error", "An unexpected error occurred"),
         };
     }
 
