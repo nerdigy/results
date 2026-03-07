@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Nerdigy.Results.Http</PackageId>
+    <Description>ASP.NET Core HTTP extensions for Nerdigy.Results</Description>
+    <Authors>Nerdigy</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/nerdigy/Results</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nerdigy/Results</RepositoryUrl>
+    <PackageTags>results;error-handling;aspnetcore;http</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nerdigy.Results\Nerdigy.Results.csproj" />
+  </ItemGroup>
+
+</Project>
