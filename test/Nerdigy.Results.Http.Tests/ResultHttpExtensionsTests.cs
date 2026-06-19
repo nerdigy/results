@@ -6,43 +6,43 @@ namespace Nerdigy.Results.Http.Tests;
 public class ResultHttpExtensionsTests
 {
     [Fact]
-    public void ToHttpResult_Success_ReturnsNoContent()
+    public void AsHttpResult_Success_ReturnsNoContent()
     {
         var result = Result.Success;
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         Assert.IsType<NoContent>(httpResult);
     }
 
     [Fact]
-    public void ToHttpResult_Success_WithCustomFactory_ReturnsCustomResult()
+    public void AsHttpResult_Success_WithCustomFactory_ReturnsCustomResult()
     {
         var result = Result.Success;
 
-        var httpResult = result.ToHttpResult(() => TypedResults.Ok("custom"));
+        var httpResult = result.AsHttpResult(() => TypedResults.Ok("custom"));
 
         var okResult = Assert.IsType<Ok<string>>(httpResult);
         Assert.Equal("custom", okResult.Value);
     }
 
     [Fact]
-    public void ToHttpResult_Failure_WithCustomFactory_ReturnsProblemDetails()
+    public void AsHttpResult_Failure_WithCustomFactory_ReturnsProblemDetails()
     {
         Result result = new NotFoundError("Not found");
 
-        var httpResult = result.ToHttpResult(() => TypedResults.Ok());
+        var httpResult = result.AsHttpResult(() => TypedResults.Ok());
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status404NotFound, problemResult.StatusCode);
     }
 
     [Fact]
-    public void ToHttpResult_BadRequestError_Returns400()
+    public void AsHttpResult_BadRequestError_Returns400()
     {
         Result result = new BadRequestError("Invalid input");
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status400BadRequest, problemResult.StatusCode);
@@ -51,11 +51,11 @@ public class ResultHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_ValidationError_ReturnsValidationProblem()
+    public void AsHttpResult_ValidationError_ReturnsValidationProblem()
     {
         Result result = new ValidationError("Email", "Email is required");
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var validationResult = Assert.IsType<ValidationProblem>(httpResult);
         Assert.Equal(StatusCodes.Status400BadRequest, validationResult.StatusCode);
@@ -64,11 +64,11 @@ public class ResultHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_UnauthorizedError_Returns401()
+    public void AsHttpResult_UnauthorizedError_Returns401()
     {
         Result result = new UnauthorizedError();
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status401Unauthorized, problemResult.StatusCode);
@@ -76,11 +76,11 @@ public class ResultHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_ForbiddenError_Returns403()
+    public void AsHttpResult_ForbiddenError_Returns403()
     {
         Result result = new ForbiddenError();
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status403Forbidden, problemResult.StatusCode);
@@ -88,11 +88,11 @@ public class ResultHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_NotFoundError_Returns404()
+    public void AsHttpResult_NotFoundError_Returns404()
     {
         Result result = new NotFoundError("User not found");
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status404NotFound, problemResult.StatusCode);
@@ -101,11 +101,11 @@ public class ResultHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_ConflictError_Returns409()
+    public void AsHttpResult_ConflictError_Returns409()
     {
         Result result = new ConflictError("Already exists");
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status409Conflict, problemResult.StatusCode);
@@ -113,11 +113,11 @@ public class ResultHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_UnprocessableError_Returns422()
+    public void AsHttpResult_UnprocessableError_Returns422()
     {
         Result result = new UnprocessableError("Semantic error");
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemResult.StatusCode);
@@ -125,11 +125,11 @@ public class ResultHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_TooManyRequestsError_Returns429()
+    public void AsHttpResult_TooManyRequestsError_Returns429()
     {
         Result result = new TooManyRequestsError();
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status429TooManyRequests, problemResult.StatusCode);
@@ -137,11 +137,11 @@ public class ResultHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_InternalError_Returns500()
+    public void AsHttpResult_InternalError_Returns500()
     {
         Result result = new InternalError();
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status500InternalServerError, problemResult.StatusCode);
@@ -149,11 +149,11 @@ public class ResultHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_ServiceUnavailableError_Returns503()
+    public void AsHttpResult_ServiceUnavailableError_Returns503()
     {
         Result result = new ServiceUnavailableError();
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status503ServiceUnavailable, problemResult.StatusCode);
@@ -161,11 +161,11 @@ public class ResultHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_GatewayTimeoutError_Returns504()
+    public void AsHttpResult_GatewayTimeoutError_Returns504()
     {
         Result result = new GatewayTimeoutError();
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status504GatewayTimeout, problemResult.StatusCode);
@@ -173,11 +173,11 @@ public class ResultHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_BaseError_Returns500()
+    public void AsHttpResult_BaseError_Returns500()
     {
         Result result = new Error();
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status500InternalServerError, problemResult.StatusCode);
