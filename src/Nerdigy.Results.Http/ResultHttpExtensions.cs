@@ -18,11 +18,9 @@ public static class ResultHttpExtensions
         /// Returns 204 No Content on success, or a Problem Details response on failure.
         /// </summary>
         /// <returns>An <see cref="IResult"/> representing the HTTP response.</returns>
-        public IResult ToHttpResult()
+        public IResult AsHttpResult()
         {
-            return result.IsSuccess
-                ? TypedResults.NoContent()
-                : ToHttpProblemResult(result.Error);
+            return result.Match<IResult>(TypedResults.NoContent, e => e.AsProblem());
         }
 
         /// <summary>
@@ -30,11 +28,9 @@ public static class ResultHttpExtensions
         /// </summary>
         /// <param name="onSuccess">Factory to produce the HTTP result on success.</param>
         /// <returns>An <see cref="IResult"/> representing the HTTP response.</returns>
-        public IResult ToHttpResult(Func<IResult> onSuccess)
+        public IResult AsHttpResult(Func<IResult> onSuccess)
         {
-            return result.IsSuccess
-                ? onSuccess()
-                : ToHttpProblemResult(result.Error);
+            return result.Match<IResult>(onSuccess, e => e.AsProblem());
         }
     }
 
@@ -48,11 +44,9 @@ public static class ResultHttpExtensions
         /// Returns 200 OK with the value on success, or a Problem Details response on failure.
         /// </summary>
         /// <returns>An <see cref="IResult"/> representing the HTTP response.</returns>
-        public IResult ToHttpResult()
+        public IResult AsHttpResult()
         {
-            return result.IsSuccess
-                ? TypedResults.Ok(result.Value)
-                : ToHttpProblemResult(result.Error);
+            return result.Match(TypedResults.Ok, e => e.AsProblem());
         }
 
         /// <summary>
@@ -60,11 +54,9 @@ public static class ResultHttpExtensions
         /// </summary>
         /// <param name="onSuccess">Factory to produce the HTTP result from the value on success.</param>
         /// <returns>An <see cref="IResult"/> representing the HTTP response.</returns>
-        public IResult ToHttpResult(Func<TValue, IResult> onSuccess)
+        public IResult AsHttpResult(Func<TValue, IResult> onSuccess)
         {
-            return result.IsSuccess
-                ? onSuccess(result.Value)
-                : ToHttpProblemResult(result.Error);
+            return result.Match(onSuccess, e => e.AsProblem());
         }
     }
 
@@ -73,7 +65,7 @@ public static class ResultHttpExtensions
     /// </summary>
     /// <param name="error">The error to convert.</param>
     /// <returns>An <see cref="IResult"/> with the appropriate HTTP status code and Problem Details body.</returns>
-    internal static IResult ToHttpProblemResult(Error error)
+    public static IResult AsProblem(this Error error)
     {
         return error switch
         {
@@ -88,7 +80,8 @@ public static class ResultHttpExtensions
             InternalError e => CreateProblem(StatusCodes.Status500InternalServerError, "Internal Server Error", e.Message),
             ServiceUnavailableError e => CreateProblem(StatusCodes.Status503ServiceUnavailable, "Service Unavailable", e.Message),
             GatewayTimeoutError e => CreateProblem(StatusCodes.Status504GatewayTimeout, "Gateway Timeout", e.Message),
-            _ => CreateProblem(StatusCodes.Status500InternalServerError, "Internal Server Error", "An unexpected error occurred"),
+            _ => CreateProblem(StatusCodes.Status500InternalServerError, "Internal Server Error",
+                "An unexpected error occurred"),
         };
     }
 

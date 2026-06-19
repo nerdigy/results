@@ -6,34 +6,34 @@ namespace Nerdigy.Results.Http.Tests;
 public class ResultTHttpExtensionsTests
 {
     [Fact]
-    public void ToHttpResult_Success_ReturnsOkWithValue()
+    public void AsHttpResult_Success_ReturnsOkWithValue()
     {
         Result<string> result = "hello";
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var okResult = Assert.IsType<Ok<string>>(httpResult);
         Assert.Equal("hello", okResult.Value);
     }
 
     [Fact]
-    public void ToHttpResult_Success_WithComplexType_ReturnsOkWithValue()
+    public void AsHttpResult_Success_WithComplexType_ReturnsOkWithValue()
     {
         var item = new TestItem(1, "Test");
         Result<TestItem> result = item;
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var okResult = Assert.IsType<Ok<TestItem>>(httpResult);
         Assert.Equal(item, okResult.Value);
     }
 
     [Fact]
-    public void ToHttpResult_Success_WithCustomFactory_ReturnsCustomResult()
+    public void AsHttpResult_Success_WithCustomFactory_ReturnsCustomResult()
     {
         Result<string> result = "hello";
 
-        var httpResult = result.ToHttpResult(value => TypedResults.Created($"/items/{value}", value));
+        var httpResult = result.AsHttpResult(value => TypedResults.Created($"/items/{value}", value));
 
         var createdResult = Assert.IsType<Created<string>>(httpResult);
         Assert.Equal("hello", createdResult.Value);
@@ -41,22 +41,22 @@ public class ResultTHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_Failure_WithCustomFactory_ReturnsProblemDetails()
+    public void AsHttpResult_Failure_WithCustomFactory_ReturnsProblemDetails()
     {
         Result<string> result = new NotFoundError("Not found");
 
-        var httpResult = result.ToHttpResult(value => TypedResults.Ok(value));
+        var httpResult = result.AsHttpResult(value => TypedResults.Ok(value));
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status404NotFound, problemResult.StatusCode);
     }
 
     [Fact]
-    public void ToHttpResult_BadRequestError_Returns400()
+    public void AsHttpResult_BadRequestError_Returns400()
     {
         Result<string> result = new BadRequestError("Invalid");
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status400BadRequest, problemResult.StatusCode);
@@ -65,11 +65,11 @@ public class ResultTHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_ValidationError_ReturnsValidationProblem()
+    public void AsHttpResult_ValidationError_ReturnsValidationProblem()
     {
         Result<string> result = new ValidationError("Name", "Name is required");
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var validationResult = Assert.IsType<ValidationProblem>(httpResult);
         Assert.Equal(StatusCodes.Status400BadRequest, validationResult.StatusCode);
@@ -78,11 +78,11 @@ public class ResultTHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_NotFoundError_Returns404()
+    public void AsHttpResult_NotFoundError_Returns404()
     {
         Result<int> result = new NotFoundError("Item not found");
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status404NotFound, problemResult.StatusCode);
@@ -90,22 +90,22 @@ public class ResultTHttpExtensionsTests
     }
 
     [Fact]
-    public void ToHttpResult_InternalError_Returns500()
+    public void AsHttpResult_InternalError_Returns500()
     {
         Result<string> result = new InternalError();
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status500InternalServerError, problemResult.StatusCode);
     }
 
     [Fact]
-    public void ToHttpResult_BaseError_Returns500()
+    public void AsHttpResult_BaseError_Returns500()
     {
         Result<string> result = new Error();
 
-        var httpResult = result.ToHttpResult();
+        var httpResult = result.AsHttpResult();
 
         var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
         Assert.Equal(StatusCodes.Status500InternalServerError, problemResult.StatusCode);
