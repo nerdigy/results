@@ -56,6 +56,21 @@ public static class ResultExtensions
         }
 
         /// <summary>
+        /// Runs a side-effect action on failure without changing the result.
+        /// </summary>
+        /// <param name="onFailure">The action to invoke with the error when the result is a failure.</param>
+        /// <returns>The original result.</returns>
+        public Result TapError(Action<Error> onFailure)
+        {
+            if (result.IsFailure)
+            {
+                onFailure(result.Error);
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Asynchronously matches the result to one of two functions based on success or failure.
         /// </summary>
         /// <typeparam name="TResult">The type of the return value.</typeparam>
@@ -98,6 +113,21 @@ public static class ResultExtensions
             if (result.IsSuccess)
             {
                 await onSuccess();
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Asynchronously runs a side-effect on failure without changing the result.
+        /// </summary>
+        /// <param name="onFailure">The async action to invoke with the error when the result is a failure.</param>
+        /// <returns>The original result.</returns>
+        public async Task<Result> TapErrorAsync(Func<Error, Task> onFailure)
+        {
+            if (result.IsFailure)
+            {
+                await onFailure(result.Error);
             }
 
             return result;
@@ -211,6 +241,40 @@ public static class ResultExtensions
 
             return result;
         }
+
+        /// <summary>
+        /// Awaits the result, then runs a side-effect action on failure without changing the result.
+        /// </summary>
+        /// <param name="onFailure">The action to invoke with the error when the result is a failure.</param>
+        /// <returns>The original result.</returns>
+        public async Task<Result> TapErrorAsync(Action<Error> onFailure)
+        {
+            var result = await task;
+
+            if (result.IsFailure)
+            {
+                onFailure(result.Error);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Awaits the result, then asynchronously runs a side-effect on failure without changing the result.
+        /// </summary>
+        /// <param name="onFailure">The async action to invoke with the error when the result is a failure.</param>
+        /// <returns>The original result.</returns>
+        public async Task<Result> TapErrorAsync(Func<Error, Task> onFailure)
+        {
+            var result = await task;
+
+            if (result.IsFailure)
+            {
+                await onFailure(result.Error);
+            }
+
+            return result;
+        }
     }
 }
 
@@ -281,6 +345,21 @@ public static class ResultTExtensions
         }
 
         /// <summary>
+        /// Runs a side-effect action on failure without changing the result.
+        /// </summary>
+        /// <param name="onFailure">The action to invoke with the error when the result is a failure.</param>
+        /// <returns>The original result.</returns>
+        public Result<TValue> TapError(Action<Error> onFailure)
+        {
+            if (result.IsFailure)
+            {
+                onFailure(result.Error);
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Asynchronously matches the result to one of two functions based on success or failure.
         /// </summary>
         /// <typeparam name="TResult">The type of the return value.</typeparam>
@@ -334,6 +413,21 @@ public static class ResultTExtensions
             if (result.IsSuccess)
             {
                 await onSuccess(result.Value);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Asynchronously runs a side-effect on failure without changing the result.
+        /// </summary>
+        /// <param name="onFailure">The async action to invoke with the error when the result is a failure.</param>
+        /// <returns>The original result.</returns>
+        public async Task<Result<TValue>> TapErrorAsync(Func<Error, Task> onFailure)
+        {
+            if (result.IsFailure)
+            {
+                await onFailure(result.Error);
             }
 
             return result;
@@ -467,6 +561,40 @@ public static class ResultTExtensions
             if (result.IsSuccess)
             {
                 await onSuccess(result.Value);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Awaits the result, then runs a side-effect action on failure without changing the result.
+        /// </summary>
+        /// <param name="onFailure">The action to invoke with the error when the result is a failure.</param>
+        /// <returns>The original result.</returns>
+        public async Task<Result<TValue>> TapErrorAsync(Action<Error> onFailure)
+        {
+            var result = await task;
+
+            if (result.IsFailure)
+            {
+                onFailure(result.Error);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Awaits the result, then asynchronously runs a side-effect on failure without changing the result.
+        /// </summary>
+        /// <param name="onFailure">The async action to invoke with the error when the result is a failure.</param>
+        /// <returns>The original result.</returns>
+        public async Task<Result<TValue>> TapErrorAsync(Func<Error, Task> onFailure)
+        {
+            var result = await task;
+
+            if (result.IsFailure)
+            {
+                await onFailure(result.Error);
             }
 
             return result;
