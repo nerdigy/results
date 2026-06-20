@@ -12,11 +12,10 @@ public record Error;
 public record BadRequestError(string Message) : Error;
 
 /// <summary>
-/// Represents a validation error containing field-level validation failures.
+/// Represents a validation error indicating the request failed validation checks.
 /// </summary>
-/// <param name="PropertyName">The name of the property that failed validation.</param>
-/// <param name="ErrorMessage">The error message describing the validation failure.</param>
-public record ValidationError(string PropertyName, string ErrorMessage) : Error;
+/// <param name="Details">A dictionary containing the validation errors, where the key is the property name and the value is an array of error messages.</param>
+public record ValidationError(Dictionary<string, string[]> Details) : Error;
 
 /// <summary>
 /// Represents an unauthorized error indicating the request lacks valid authentication credentials.
