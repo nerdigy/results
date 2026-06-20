@@ -237,4 +237,66 @@ public sealed class ResultTests
         Assert.False(tapped);
         Assert.True(returned.IsFailure);
     }
+
+    [Fact]
+    public void TapError_OnFailure_InvokesAction()
+    {
+        var error = new BadRequestError("fail");
+        Result result = error;
+        Error? tappedError = null;
+
+        var returned = result.TapError(e => tappedError = e);
+
+        Assert.Equal(error, tappedError);
+        Assert.True(returned.IsFailure);
+        Assert.Equal(error, returned.Error);
+    }
+
+    [Fact]
+    public void TapError_OnSuccess_DoesNotInvokeAction()
+    {
+        var result = Result.Success;
+        var tapped = false;
+
+        var returned = result.TapError(_ => tapped = true);
+
+        Assert.False(tapped);
+        Assert.True(returned.IsSuccess);
+    }
+
+    [Fact]
+    public async Task TapErrorAsync_OnFailure_InvokesAction()
+    {
+        var error = new BadRequestError("fail");
+        Result result = error;
+        Error? tappedError = null;
+
+        var returned = await result.TapErrorAsync(e =>
+        {
+            tappedError = e;
+
+            return Task.CompletedTask;
+        });
+
+        Assert.Equal(error, tappedError);
+        Assert.True(returned.IsFailure);
+        Assert.Equal(error, returned.Error);
+    }
+
+    [Fact]
+    public async Task TapErrorAsync_OnSuccess_DoesNotInvokeAction()
+    {
+        var result = Result.Success;
+        var tapped = false;
+
+        var returned = await result.TapErrorAsync(_ =>
+        {
+            tapped = true;
+
+            return Task.CompletedTask;
+        });
+
+        Assert.False(tapped);
+        Assert.True(returned.IsSuccess);
+    }
 }

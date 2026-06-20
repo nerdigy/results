@@ -222,6 +222,66 @@ public sealed class TaskResultTExtensionsTests
     }
 
     [Fact]
+    public async Task TapErrorAsync_Sync_OnFailure_InvokesAction()
+    {
+        var error = new BadRequestError("fail");
+        Error? tappedError = null;
+
+        var returned = await FailureAsync(error).TapErrorAsync(e => tappedError = e);
+
+        Assert.Equal(error, tappedError);
+        Assert.True(returned.IsFailure);
+        Assert.Equal(error, returned.Error);
+    }
+
+    [Fact]
+    public async Task TapErrorAsync_Sync_OnSuccess_DoesNotInvokeAction()
+    {
+        var tapped = false;
+
+        var returned = await SuccessAsync().TapErrorAsync(_ => tapped = true);
+
+        Assert.False(tapped);
+        Assert.True(returned.IsSuccess);
+        Assert.Equal(42, returned.Value);
+    }
+
+    [Fact]
+    public async Task TapErrorAsync_Async_OnFailure_InvokesAction()
+    {
+        var error = new BadRequestError("fail");
+        Error? tappedError = null;
+
+        var returned = await FailureAsync(error).TapErrorAsync(e =>
+        {
+            tappedError = e;
+
+            return Task.CompletedTask;
+        });
+
+        Assert.Equal(error, tappedError);
+        Assert.True(returned.IsFailure);
+        Assert.Equal(error, returned.Error);
+    }
+
+    [Fact]
+    public async Task TapErrorAsync_Async_OnSuccess_DoesNotInvokeAction()
+    {
+        var tapped = false;
+
+        var returned = await SuccessAsync().TapErrorAsync(_ =>
+        {
+            tapped = true;
+
+            return Task.CompletedTask;
+        });
+
+        Assert.False(tapped);
+        Assert.True(returned.IsSuccess);
+        Assert.Equal(42, returned.Value);
+    }
+
+    [Fact]
     public async Task BindAsync_ChainsValueProducingThenValuelessOperation()
     {
         // Mirrors a create-then-sign-in style chain off an async operation.
