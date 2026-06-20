@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Nerdigy.Results.Http;
 
@@ -69,49 +68,15 @@ public static class ResultHttpExtensions
     {
         return error switch
         {
-            ValidationError e => CreateValidationProblem(e),
-            BadRequestError e => CreateProblem(StatusCodes.Status400BadRequest, "Bad Request", e.Message),
-            UnauthorizedError e => CreateProblem(StatusCodes.Status401Unauthorized, "Unauthorized", e.Message),
-            ForbiddenError e => CreateProblem(StatusCodes.Status403Forbidden, "Forbidden", e.Message),
-            NotFoundError e => CreateProblem(StatusCodes.Status404NotFound, "Not Found", e.Message),
-            ConflictError e => CreateProblem(StatusCodes.Status409Conflict, "Conflict", e.Message),
-            UnprocessableError e => CreateProblem(StatusCodes.Status422UnprocessableEntity, "Unprocessable Entity", e.Message),
-            TooManyRequestsError e => CreateProblem(StatusCodes.Status429TooManyRequests, "Too Many Requests", e.Message),
-            InternalError e => CreateProblem(StatusCodes.Status500InternalServerError, "Internal Server Error", e.Message),
-            ServiceUnavailableError e => CreateProblem(StatusCodes.Status503ServiceUnavailable, "Service Unavailable", e.Message),
-            GatewayTimeoutError e => CreateProblem(StatusCodes.Status504GatewayTimeout, "Gateway Timeout", e.Message),
-            _ => CreateProblem(StatusCodes.Status500InternalServerError, "Internal Server Error",
-                "An unexpected error occurred"),
+            ValidationError e => TypedResults.ValidationProblem(e.Details),
+            BadRequestError e => TypedResults.BadRequest(e.Message),
+            UnauthorizedError => TypedResults.Unauthorized(),
+            ForbiddenError => TypedResults.Forbid(),
+            NotFoundError e => TypedResults.NotFound(e.Message),
+            ConflictError e => TypedResults.Conflict(e.Message),
+            UnprocessableError e => TypedResults.UnprocessableEntity(e.Message),
+            InternalError e => TypedResults.InternalServerError(e.Message),
+            _ => TypedResults.InternalServerError()
         };
-    }
-
-    /// <summary>
-    /// Creates a Problem Details <see cref="IResult"/> with the specified status code, title, and detail.
-    /// </summary>
-    /// <param name="statusCode">The HTTP status code.</param>
-    /// <param name="title">The short, human-readable summary of the problem type.</param>
-    /// <param name="detail">The human-readable explanation specific to this occurrence of the problem.</param>
-    /// <returns>An <see cref="ProblemHttpResult"/> containing the Problem Details response.</returns>
-    private static ProblemHttpResult CreateProblem(int statusCode, string title, string detail)
-    {
-        return TypedResults.Problem(
-            detail: detail,
-            statusCode: statusCode,
-            title: title);
-    }
-
-    /// <summary>
-    /// Creates a Validation Problem Details <see cref="IResult"/> from the specified <see cref="ValidationError"/>.
-    /// </summary>
-    /// <param name="validation">The validation error containing the property name and error message.</param>
-    /// <returns>An <see cref="ValidationProblem"/> containing the Validation Problem Details response.</returns>
-    private static ValidationProblem CreateValidationProblem(ValidationError validation)
-    {
-        var errors = new Dictionary<string, string[]>
-        {
-            [validation.PropertyName] = [validation.ErrorMessage],
-        };
-
-        return TypedResults.ValidationProblem(errors);
     }
 }
