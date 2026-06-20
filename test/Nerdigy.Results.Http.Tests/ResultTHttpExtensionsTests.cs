@@ -41,14 +41,14 @@ public class ResultTHttpExtensionsTests
     }
 
     [Fact]
-    public void AsHttpResult_Failure_WithCustomFactory_ReturnsProblemDetails()
+    public void AsHttpResult_Failure_WithCustomFactory_ReturnsProblem()
     {
         Result<string> result = new NotFoundError("Not found");
 
         var httpResult = result.AsHttpResult(value => TypedResults.Ok(value));
 
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status404NotFound, problemResult.StatusCode);
+        var notFoundResult = Assert.IsType<NotFound<string>>(httpResult);
+        Assert.Equal(StatusCodes.Status404NotFound, notFoundResult.StatusCode);
     }
 
     [Fact]
@@ -58,16 +58,18 @@ public class ResultTHttpExtensionsTests
 
         var httpResult = result.AsHttpResult();
 
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status400BadRequest, problemResult.StatusCode);
-        Assert.Equal("Bad Request", problemResult.ProblemDetails.Title);
-        Assert.Equal("Invalid", problemResult.ProblemDetails.Detail);
+        var badRequestResult = Assert.IsType<BadRequest<string>>(httpResult);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
+        Assert.Equal("Invalid", badRequestResult.Value);
     }
 
     [Fact]
     public void AsHttpResult_ValidationError_ReturnsValidationProblem()
     {
-        Result<string> result = new ValidationError("Name", "Name is required");
+        Result<string> result = new ValidationError(new Dictionary<string, string[]>
+        {
+            ["Name"] = ["Name is required"],
+        });
 
         var httpResult = result.AsHttpResult();
 
@@ -84,9 +86,9 @@ public class ResultTHttpExtensionsTests
 
         var httpResult = result.AsHttpResult();
 
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status404NotFound, problemResult.StatusCode);
-        Assert.Equal("Item not found", problemResult.ProblemDetails.Detail);
+        var notFoundResult = Assert.IsType<NotFound<string>>(httpResult);
+        Assert.Equal(StatusCodes.Status404NotFound, notFoundResult.StatusCode);
+        Assert.Equal("Item not found", notFoundResult.Value);
     }
 
     [Fact]
@@ -96,8 +98,8 @@ public class ResultTHttpExtensionsTests
 
         var httpResult = result.AsHttpResult();
 
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status500InternalServerError, problemResult.StatusCode);
+        var internalResult = Assert.IsType<InternalServerError<string>>(httpResult);
+        Assert.Equal(StatusCodes.Status500InternalServerError, internalResult.StatusCode);
     }
 
     [Fact]
@@ -107,9 +109,8 @@ public class ResultTHttpExtensionsTests
 
         var httpResult = result.AsHttpResult();
 
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status500InternalServerError, problemResult.StatusCode);
-        Assert.Equal("An unexpected error occurred", problemResult.ProblemDetails.Detail);
+        var internalResult = Assert.IsType<InternalServerError>(httpResult);
+        Assert.Equal(StatusCodes.Status500InternalServerError, internalResult.StatusCode);
     }
 
     private record TestItem(int Id, string Name);

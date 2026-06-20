@@ -27,14 +27,14 @@ public class ResultHttpExtensionsTests
     }
 
     [Fact]
-    public void AsHttpResult_Failure_WithCustomFactory_ReturnsProblemDetails()
+    public void AsHttpResult_Failure_WithCustomFactory_ReturnsProblem()
     {
         Result result = new NotFoundError("Not found");
 
         var httpResult = result.AsHttpResult(() => TypedResults.Ok());
 
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status404NotFound, problemResult.StatusCode);
+        var notFoundResult = Assert.IsType<NotFound<string>>(httpResult);
+        Assert.Equal(StatusCodes.Status404NotFound, notFoundResult.StatusCode);
     }
 
     [Fact]
@@ -44,16 +44,18 @@ public class ResultHttpExtensionsTests
 
         var httpResult = result.AsHttpResult();
 
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status400BadRequest, problemResult.StatusCode);
-        Assert.Equal("Bad Request", problemResult.ProblemDetails.Title);
-        Assert.Equal("Invalid input", problemResult.ProblemDetails.Detail);
+        var badRequestResult = Assert.IsType<BadRequest<string>>(httpResult);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
+        Assert.Equal("Invalid input", badRequestResult.Value);
     }
 
     [Fact]
     public void AsHttpResult_ValidationError_ReturnsValidationProblem()
     {
-        Result result = new ValidationError("Email", "Email is required");
+        Result result = new ValidationError(new Dictionary<string, string[]>
+        {
+            ["Email"] = ["Email is required"],
+        });
 
         var httpResult = result.AsHttpResult();
 
@@ -70,9 +72,8 @@ public class ResultHttpExtensionsTests
 
         var httpResult = result.AsHttpResult();
 
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status401Unauthorized, problemResult.StatusCode);
-        Assert.Equal("Unauthorized", problemResult.ProblemDetails.Title);
+        var unauthorizedResult = Assert.IsType<UnauthorizedHttpResult>(httpResult);
+        Assert.Equal(StatusCodes.Status401Unauthorized, unauthorizedResult.StatusCode);
     }
 
     [Fact]
@@ -82,9 +83,7 @@ public class ResultHttpExtensionsTests
 
         var httpResult = result.AsHttpResult();
 
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status403Forbidden, problemResult.StatusCode);
-        Assert.Equal("Forbidden", problemResult.ProblemDetails.Title);
+        Assert.IsType<ForbidHttpResult>(httpResult);
     }
 
     [Fact]
@@ -94,10 +93,9 @@ public class ResultHttpExtensionsTests
 
         var httpResult = result.AsHttpResult();
 
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status404NotFound, problemResult.StatusCode);
-        Assert.Equal("Not Found", problemResult.ProblemDetails.Title);
-        Assert.Equal("User not found", problemResult.ProblemDetails.Detail);
+        var notFoundResult = Assert.IsType<NotFound<string>>(httpResult);
+        Assert.Equal(StatusCodes.Status404NotFound, notFoundResult.StatusCode);
+        Assert.Equal("User not found", notFoundResult.Value);
     }
 
     [Fact]
@@ -107,9 +105,9 @@ public class ResultHttpExtensionsTests
 
         var httpResult = result.AsHttpResult();
 
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status409Conflict, problemResult.StatusCode);
-        Assert.Equal("Conflict", problemResult.ProblemDetails.Title);
+        var conflictResult = Assert.IsType<Conflict<string>>(httpResult);
+        Assert.Equal(StatusCodes.Status409Conflict, conflictResult.StatusCode);
+        Assert.Equal("Already exists", conflictResult.Value);
     }
 
     [Fact]
@@ -119,21 +117,9 @@ public class ResultHttpExtensionsTests
 
         var httpResult = result.AsHttpResult();
 
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemResult.StatusCode);
-        Assert.Equal("Unprocessable Entity", problemResult.ProblemDetails.Title);
-    }
-
-    [Fact]
-    public void AsHttpResult_TooManyRequestsError_Returns429()
-    {
-        Result result = new TooManyRequestsError();
-
-        var httpResult = result.AsHttpResult();
-
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status429TooManyRequests, problemResult.StatusCode);
-        Assert.Equal("Too Many Requests", problemResult.ProblemDetails.Title);
+        var unprocessableResult = Assert.IsType<UnprocessableEntity<string>>(httpResult);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, unprocessableResult.StatusCode);
+        Assert.Equal("Semantic error", unprocessableResult.Value);
     }
 
     [Fact]
@@ -143,33 +129,8 @@ public class ResultHttpExtensionsTests
 
         var httpResult = result.AsHttpResult();
 
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status500InternalServerError, problemResult.StatusCode);
-        Assert.Equal("Internal Server Error", problemResult.ProblemDetails.Title);
-    }
-
-    [Fact]
-    public void AsHttpResult_ServiceUnavailableError_Returns503()
-    {
-        Result result = new ServiceUnavailableError();
-
-        var httpResult = result.AsHttpResult();
-
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status503ServiceUnavailable, problemResult.StatusCode);
-        Assert.Equal("Service Unavailable", problemResult.ProblemDetails.Title);
-    }
-
-    [Fact]
-    public void AsHttpResult_GatewayTimeoutError_Returns504()
-    {
-        Result result = new GatewayTimeoutError();
-
-        var httpResult = result.AsHttpResult();
-
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status504GatewayTimeout, problemResult.StatusCode);
-        Assert.Equal("Gateway Timeout", problemResult.ProblemDetails.Title);
+        var internalResult = Assert.IsType<InternalServerError<string>>(httpResult);
+        Assert.Equal(StatusCodes.Status500InternalServerError, internalResult.StatusCode);
     }
 
     [Fact]
@@ -179,8 +140,7 @@ public class ResultHttpExtensionsTests
 
         var httpResult = result.AsHttpResult();
 
-        var problemResult = Assert.IsType<ProblemHttpResult>(httpResult);
-        Assert.Equal(StatusCodes.Status500InternalServerError, problemResult.StatusCode);
-        Assert.Equal("An unexpected error occurred", problemResult.ProblemDetails.Detail);
+        var internalResult = Assert.IsType<InternalServerError>(httpResult);
+        Assert.Equal(StatusCodes.Status500InternalServerError, internalResult.StatusCode);
     }
 }
