@@ -20,14 +20,12 @@ public record ValidationError(Dictionary<string, string[]> Details) : Error;
 /// <summary>
 /// Represents an unauthorized error indicating the request lacks valid authentication credentials.
 /// </summary>
-/// <param name="Message">The error message describing the authentication failure.</param>
-public record UnauthorizedError(string Message = "Unauthorized") : Error;
+public record UnauthorizedError : Error;
 
 /// <summary>
 /// Represents a forbidden error indicating the requester does not have permission to perform the action.
 /// </summary>
-/// <param name="Message">The error message describing the authorization failure.</param>
-public record ForbiddenError(string Message = "Forbidden") : Error;
+public record ForbiddenError : Error;
 
 /// <summary>
 /// Represents a not found error indicating the requested resource does not exist.
@@ -48,25 +46,7 @@ public record ConflictError(string Message) : Error;
 public record UnprocessableError(string Message) : Error;
 
 /// <summary>
-/// Represents a rate limiting error indicating too many requests have been made.
-/// </summary>
-/// <param name="Message">The error message describing the rate limit.</param>
-public record TooManyRequestsError(string Message = "Too many requests") : Error;
-
-/// <summary>
 /// Represents an internal error indicating an unexpected failure occurred.
 /// </summary>
 /// <param name="Message">The error message describing the failure.</param>
 public record InternalError(string Message = "An internal error occurred") : Error;
-
-/// <summary>
-/// Represents a service unavailable error indicating the service is temporarily unable to handle the request.
-/// </summary>
-/// <param name="Message">The error message describing the unavailability.</param>
-public record ServiceUnavailableError(string Message = "Service unavailable") : Error;
-
-/// <summary>
-/// Represents a gateway timeout error indicating an upstream service did not respond in time.
-/// </summary>
-/// <param name="Message">The error message describing the timeout.</param>
-public record GatewayTimeoutError(string Message = "Gateway timeout") : Error;
